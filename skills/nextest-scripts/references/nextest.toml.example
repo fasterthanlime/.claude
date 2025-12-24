@@ -1,0 +1,74 @@
+# Example .config/nextest.toml with common profiles
+# Copy relevant sections to your project's .config/nextest.toml
+
+# =============================================================================
+# Wrapper Scripts
+# =============================================================================
+
+[scripts.wrapper.valgrind]
+command = 'valgrind --leak-check=full --show-leak-kinds=all --errors-for-leak-kinds=definite,indirect --error-exitcode=1'
+
+[scripts.wrapper.callgrind]
+command = 'valgrind --tool=callgrind --callgrind-out-file=callgrind.out.%p --cache-sim=yes'
+
+[scripts.wrapper.limited]
+# Requires: systemd (Linux)
+# Set MEMORY_LIMIT env var, defaults to 2G
+command = 'systemd-run --user --scope -p MemoryMax=${MEMORY_LIMIT:-2G} -p MemorySwapMax=0'
+
+[scripts.wrapper.timeout]
+# Kill test after TIMEOUT seconds (default 60)
+command = 'timeout ${TIMEOUT:-60}'
+
+# =============================================================================
+# Profiles
+# =============================================================================
+
+[profile.default]
+retries = 0
+fail-fast = true
+
+[profile.ci]
+retries = 2
+fail-fast = false
+test-threads = 4
+
+# Memory debugging with valgrind
+[profile.valgrind]
+platform = 'cfg(target_os = "linux")'
+run-wrapper = 'valgrind'
+test-threads = 1
+slow-timeout = { period = "120s", terminate-after = 2 }
+
+# Performance profiling with callgrind
+[profile.callgrind]
+platform = 'cfg(target_os = "linux")'
+run-wrapper = 'callgrind'
+test-threads = 1
+slow-timeout = { period = "300s", terminate-after = 2 }
+
+# Memory-limited tests
+[profile.limited]
+platform = 'cfg(target_os = "linux")'
+run-wrapper = 'limited'
+
+# Strict timeout for potentially hanging tests
+[profile.timeout]
+run-wrapper = 'timeout'
+
+# =============================================================================
+# Usage Examples
+# =============================================================================
+#
+# Run with valgrind:
+#   cargo nextest run --profile valgrind -p mypkg test_name
+#
+# Run with memory limit:
+#   MEMORY_LIMIT=512M cargo nextest run --profile limited -p mypkg
+#
+# Profile with callgrind:
+#   cargo nextest run --profile callgrind -p mypkg test_name
+#   kcachegrind callgrind.out.*
+#
+# CI mode:
+#   cargo nextest run --profile ci

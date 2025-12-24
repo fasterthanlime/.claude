@@ -1,0 +1,1 @@
+- as a rule: if you try something and it doesn't exist as an API, but it makes _sense_, it's worth pitching it to me.

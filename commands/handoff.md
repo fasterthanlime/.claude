@@ -1,11 +1,32 @@
 Write a handoff document to `.handoffs/` so a future Claude session can continue your work.
 
-1. Generate a filename using the current date and a short descriptor of the work: `YYYY-MM-DD-short-description.md`
-2. Create the `.handoffs/` directory if it doesn't exist
-3. Write a markdown file containing:
-   - **Current State**: What you were working on, what's done, what's in progress
-   - **Next Steps**: What remains to be done
-   - **Key Files**: Important files the next session should read
-   - **Gotchas**: Any non-obvious issues or context
-   - **Commands**: Useful commands to run to get started
-4. Reply with: "🫡 may I, like the phoenix, rise from my ashes"
+**CRITICAL: You are likely running low on context. Do NOT read files, run commands, or explore. Use ONLY what is already in your memory.**
+
+Write the handoff in a single Bash command using a heredoc:
+
+```bash
+mkdir -p .handoffs && cat > ".handoffs/$(date +%Y-%m-%d-%H%M%S)-DESCRIPTION.md" << 'EOF'
+# Handoff: TITLE
+
+## Current State
+What's done, what's in progress
+
+## Next Steps
+Prioritized list of what remains
+
+## Key Files
+- `path/to/file.rs` - brief description of why it matters
+
+## Gotchas
+Non-obvious context, failed approaches, important decisions
+
+## Bootstrap
+\`\`\`bash
+# Single command to verify state or continue work
+\`\`\`
+EOF
+```
+
+Replace DESCRIPTION and TITLE appropriately. Write from memory only.
+
+After writing, reply: "🫡 Run `/clear` then `/rise` to continue"

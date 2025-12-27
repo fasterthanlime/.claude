@@ -1,0 +1,14 @@
+{
+	"sections": [
+		"introduction",
+		"troubleshooting",
+		"faq",
+		"guide",
+		"server-side-rendering",
+		"router",
+		"cookbook",
+		"reference",
+		"migration",
+		"contributing"
+	]
+}
